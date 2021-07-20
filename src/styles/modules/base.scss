@@ -1,0 +1,12 @@
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans|Noto+Sans+KR');
+@import './variables.scss';
+
+$bg-color: #3068cc;
+
+body {
+  line-height: 1.6;
+  font-size: $font-size-default;
+  font-family: 'Noto Sans KR', 'Noto Sans', 'Malgun Gothic', sans-serif;
+  color: $black;
+  background: $bg-color;
+}

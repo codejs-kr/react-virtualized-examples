@@ -1,0 +1,27 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border: 0;
+  font-family: system-ui, 'AppleSDGothicNeo', sans-serif;
+  font-style: normal;
+  word-wrap: break-word;
+  word-break: keep-all;
+  hyphens: auto;
+}
+
+*:focus {
+  outline: none;
+}
+
+input {
+  &:disabled {
+    background-color: #ebebe4;
+  }
+}
+
+button {
+  cursor: pointer;
+  border: 0;
+  background: none;
+}

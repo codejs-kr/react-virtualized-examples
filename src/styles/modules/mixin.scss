@@ -1,0 +1,17 @@
+@mixin flex-center-vertical($justifyContent: space-between) {
+  display: flex;
+  flex-direction: column;
+  justify-content: $justifyContent;
+}
+
+@mixin flex-center() {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin ellipsis() {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}

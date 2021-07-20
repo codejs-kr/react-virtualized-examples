@@ -10,3 +10,16 @@ body {
   color: $black;
   background: $bg-color;
 }
+
+.navigation {
+  a {
+    padding: 10px;
+    background-color: #bbb;
+    text-align: center;
+
+    &.selected {
+      background-color: #61dafb;
+      font-weight: bold;
+    }
+  }
+}

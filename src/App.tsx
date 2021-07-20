@@ -1,29 +1,25 @@
 import { HashRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
-import { ChakraProvider, Flex, Container, Menu, MenuButton, MenuList, MenuItem, IconButton } from '@chakra-ui/react';
+import { ChakraProvider, Flex, Container } from '@chakra-ui/react';
 
-import { HamburgerIcon } from '@chakra-ui/icons';
+import Navigation from './components/Navigation';
 import TextList from './pages/TextList';
 import ImageList from './pages/ImageList';
+import TextListVirtualized from './pages/TextListVirtualized';
+import ImageListVirtualized from './pages/ImageListVirtualized';
 
 const App = () => {
   return (
     <ChakraProvider>
       <Flex>
-        <Container width="700px">
+        <Container width="700px" padding={`20px 15px`}>
           <Router>
-            <Container>
-              <Menu>
-                <MenuButton as={IconButton} aria-label="Options" icon={<HamburgerIcon />} variant="outline" />
-                <MenuList>
-                  <MenuItem>기본 리스트</MenuItem>
-                  <MenuItem>적용된 리스트</MenuItem>
-                </MenuList>
-              </Menu>
-            </Container>
+            <Navigation />
             <Switch>
               <Route exact path="/" component={TextList} />
               <Route path="/text-list" component={TextList} />
               <Route path="/image-list" component={ImageList} />
+              <Route path="/text-list-virtualized" component={TextListVirtualized} />
+              <Route path="/image-list-virtualized" component={ImageListVirtualized} />
               <Redirect to="/" />
             </Switch>
           </Router>

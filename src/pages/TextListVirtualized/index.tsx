@@ -1,57 +1,71 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { WindowScroller, CellMeasurer, CellMeasurerCache, AutoSizer, List, ListRowProps } from 'react-virtualized';
-import { Container, Heading, Button, Text, Stack, Skeleton } from '@chakra-ui/react';
+import { checkInfiniteScrollPosition } from '../../helpers/scroll';
+import { throttle } from 'lodash-es';
 
-interface Post {
-  id: number;
-  userId: number;
-  title: string;
-  body: string;
-}
+import { TextListItem } from '../TextList';
+import { Container, Heading, Button, Text } from '@chakra-ui/react';
+import StackSkleton from '../../components/StackSkeleton';
+import './index.scss';
 
-const cache = new CellMeasurerCache({
+const cellCache = new CellMeasurerCache({
   defaultWidth: 100,
   fixedWidth: true,
 });
 
+let isFetching: boolean = false;
+
 const TextListVirtualized = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [list, setList] = useState<TextListItem[]>([]);
   const listRef = useRef<List>(null);
 
   const rowRenderer = ({ index, key, parent, style }: ListRowProps) => {
     return (
-      <CellMeasurer cache={cache} parent={parent} key={key} columnIndex={0} rowIndex={index}>
-        <div style={style}>
-          <div
-            style={{
-              padding: 10,
-              marginBottom: 10,
-              color: 'white',
-              backgroundColor: '#282c34',
-            }}
-          >
-            <div>index: {index}</div>
-            <div>title: {posts[index].title}</div>
-            <div>body: {posts[index].body}</div>
+      <CellMeasurer cache={cellCache} parent={parent} key={key} columnIndex={0} rowIndex={index}>
+        <div style={style} key={index}>
+          <div className="text-list-item">
+            <p>index: {index}</p>
+            <p>email: {list[index].email}</p>
+            <p>name: {list[index].name}</p>
+            <p>body: {list[index].body}</p>
           </div>
         </div>
       </CellMeasurer>
     );
   };
 
-  const addPosts = useCallback(() => {
-    fetch('https://jsonplaceholder.typicode.com/posts').then((response) => {
-      const data = response.json();
+  const addList = useCallback(() => {
+    isFetching = true;
+    fetch('https://jsonplaceholder.typicode.com/comments').then((res) => {
+      const data = res.json();
 
-      data.then((newPosts) => {
-        setPosts([...posts, ...newPosts]);
+      data.then((newList) => {
+        setList([...list, ...newList]);
+        isFetching = false;
       });
     });
-  }, [posts, setPosts]);
+  }, [list, setList]);
 
   useEffect(() => {
-    addPosts();
+    addList();
   }, []);
+
+  const onScroll = useCallback(() => {
+    if (isFetching) {
+      return false;
+    }
+
+    const isNeedFetching = checkInfiniteScrollPosition({ bottom: 600 });
+    if (isNeedFetching) {
+      addList();
+    }
+  }, [addList]);
+
+  useEffect(() => {
+    const onScrollTrottle = throttle(onScroll, 100);
+    window.addEventListener('scroll', onScrollTrottle, { passive: true });
+    return () => window.removeEventListener('scroll', onScrollTrottle);
+  }, [onScroll]);
 
   return (
     <>
@@ -59,45 +73,42 @@ const TextListVirtualized = () => {
         <Heading size="md" mb={5} textAlign="center">
           react-virtualized (O)
         </Heading>
-        <Button mb={5} colorScheme="blue" onClick={addPosts}>
+        <Button mb={5} colorScheme="blue" onClick={addList}>
           목록 추가하기
         </Button>
         <Text fontSize="20px" color="tomato">
-          현재목록: {posts.length} 개
+          현재목록: {list.length} 개
         </Text>
       </Container>
-      {posts.length ? (
-        <WindowScroller>
-          {({ height, scrollTop, isScrolling, onChildScroll }) => (
-            <AutoSizer disableHeight>
-              {({ width }) => (
-                <List
-                  ref={listRef}
-                  autoHeight
-                  height={height}
-                  width={width}
-                  isScrolling={isScrolling}
-                  overscanRowCount={0}
-                  onScroll={onChildScroll}
-                  scrollTop={scrollTop}
-                  rowCount={posts.length}
-                  rowHeight={cache.rowHeight}
-                  rowRenderer={rowRenderer}
-                  deferredMeasurementCache={cache}
-                />
-              )}
-            </AutoSizer>
-          )}
-        </WindowScroller>
-      ) : (
-        <Stack>
-          <Skeleton height="150px" />
-          <Skeleton height="150px" />
-          <Skeleton height="150px" />
-          <Skeleton height="150px" />
-          <Skeleton height="150px" />
-        </Stack>
-      )}
+
+      <section>
+        {list.length ? (
+          <WindowScroller>
+            {({ height, scrollTop, isScrolling, onChildScroll }) => (
+              <AutoSizer disableHeight>
+                {({ width }) => (
+                  <List
+                    ref={listRef}
+                    autoHeight
+                    height={height}
+                    width={width}
+                    isScrolling={isScrolling}
+                    overscanRowCount={0}
+                    onScroll={onChildScroll}
+                    scrollTop={scrollTop}
+                    rowCount={list.length}
+                    rowHeight={cellCache.rowHeight}
+                    rowRenderer={rowRenderer}
+                    deferredMeasurementCache={cellCache}
+                  />
+                )}
+              </AutoSizer>
+            )}
+          </WindowScroller>
+        ) : (
+          <StackSkleton count={5} />
+        )}
+      </section>
     </>
   );
 };

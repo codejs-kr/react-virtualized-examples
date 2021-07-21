@@ -1,56 +1,30 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { WindowScroller, CellMeasurer, CellMeasurerCache, AutoSizer, List, ListRowProps } from 'react-virtualized';
+import { useEffect, useState, useCallback } from 'react';
 import { Container, Heading, Button, Text } from '@chakra-ui/react';
+import StackSkleton from '../../components/StackSkeleton';
+import './index.scss';
 
-interface Post {
+export interface TextListItem {
   id: number;
-  userId: number;
-  title: string;
+  name: string;
+  email: string;
   body: string;
 }
 
-const cache = new CellMeasurerCache({
-  defaultWidth: 100,
-  fixedWidth: true,
-});
-
 const TextList = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const listRef = useRef<List>(null);
+  const [list, setList] = useState<TextListItem[]>([]);
 
-  const rowRenderer = ({ index, key, parent, style }: ListRowProps) => {
-    return (
-      <CellMeasurer cache={cache} parent={parent} key={key} columnIndex={0} rowIndex={index}>
-        <div style={style}>
-          <div
-            style={{
-              padding: 10,
-              marginBottom: 10,
-              color: 'white',
-              backgroundColor: '#282c34',
-            }}
-          >
-            <div>index: {index}</div>
-            <div>title: {posts[index].title}</div>
-            <div>body: {posts[index].body}</div>
-          </div>
-        </div>
-      </CellMeasurer>
-    );
-  };
+  const addList = useCallback(() => {
+    fetch('https://jsonplaceholder.typicode.com/comments').then((res) => {
+      const data = res.json();
 
-  const addPosts = useCallback(() => {
-    fetch('https://jsonplaceholder.typicode.com/posts').then((response) => {
-      const data = response.json();
-
-      data.then((newPosts) => {
-        setPosts([...posts, ...newPosts]);
+      data.then((newList) => {
+        setList([...list, ...newList]);
       });
     });
-  }, [posts, setPosts]);
+  }, [list, setList]);
 
   useEffect(() => {
-    addPosts();
+    addList();
   }, []);
 
   return (
@@ -59,35 +33,28 @@ const TextList = () => {
         <Heading size="md" mb={5} textAlign="center">
           react-virtualized (X)
         </Heading>
-        <Button mb={5} colorScheme="blue" onClick={addPosts}>
+        <Button mb={5} colorScheme="blue" onClick={addList}>
           목록 추가하기
         </Button>
         <Text fontSize="20px" color="tomato">
-          현재목록: {posts.length} 개
+          현재목록: {list.length} 개
         </Text>
       </Container>
-      <WindowScroller>
-        {({ height, scrollTop, isScrolling, onChildScroll }) => (
-          <AutoSizer disableHeight>
-            {({ width }) => (
-              <List
-                ref={listRef}
-                autoHeight
-                height={height}
-                width={width}
-                isScrolling={isScrolling}
-                overscanRowCount={0}
-                onScroll={onChildScroll}
-                scrollTop={scrollTop}
-                rowCount={posts.length}
-                rowHeight={cache.rowHeight}
-                rowRenderer={rowRenderer}
-                deferredMeasurementCache={cache}
-              />
-            )}
-          </AutoSizer>
+
+      <section>
+        {list.length ? (
+          list.map(({ name, email, body }, index) => (
+            <div className="text-list-item" key={index}>
+              <p>index: {index}</p>
+              <p>email: {email}</p>
+              <p>name: {name}</p>
+              <p>body: {body}</p>
+            </div>
+          ))
+        ) : (
+          <StackSkleton count={5} />
         )}
-      </WindowScroller>
+      </section>
     </>
   );
 };

@@ -1,24 +1,31 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, Fragment } from 'react';
+import { checkInfiniteScrollPosition } from '../../helpers/scroll';
+import { throttle } from 'lodash-es';
+
 import { Container, Heading, Button, Text } from '@chakra-ui/react';
 import StackSkleton from '../../components/StackSkeleton';
-import './index.scss';
+import TextListItem from '../../components/TextListItem';
 
-export interface TextListItem {
+export interface TextListItemState {
   id: number;
   name: string;
   email: string;
   body: string;
 }
 
+let isFetching: boolean = false;
+
 const TextList = () => {
-  const [list, setList] = useState<TextListItem[]>([]);
+  const [list, setList] = useState<TextListItemState[]>([]);
 
   const addList = useCallback(() => {
+    isFetching = true;
     fetch('https://jsonplaceholder.typicode.com/comments').then((res) => {
       const data = res.json();
 
       data.then((newList) => {
         setList([...list, ...newList]);
+        isFetching = false;
       });
     });
   }, [list, setList]);
@@ -26,6 +33,23 @@ const TextList = () => {
   useEffect(() => {
     addList();
   }, []);
+
+  const onScroll = useCallback(() => {
+    if (isFetching) {
+      return false;
+    }
+
+    const isNeedFetching = checkInfiniteScrollPosition({ bottom: 600 });
+    if (isNeedFetching) {
+      addList();
+    }
+  }, [addList]);
+
+  useEffect(() => {
+    const onScrollTrottle = throttle(onScroll, 100);
+    window.addEventListener('scroll', onScrollTrottle, { passive: true });
+    return () => window.removeEventListener('scroll', onScrollTrottle);
+  }, [onScroll]);
 
   return (
     <>
@@ -44,12 +68,9 @@ const TextList = () => {
       <section>
         {list.length ? (
           list.map(({ name, email, body }, index) => (
-            <div className="text-list-item" key={index}>
-              <p>index: {index}</p>
-              <p>email: {email}</p>
-              <p>name: {name}</p>
-              <p>body: {body}</p>
-            </div>
+            <Fragment key={index}>
+              <TextListItem index={index} email={email} name={name} body={body} />
+            </Fragment>
           ))
         ) : (
           <StackSkleton count={5} />

@@ -3,21 +3,20 @@ import { WindowScroller, CellMeasurer, CellMeasurerCache, AutoSizer, List, ListR
 import { checkInfiniteScrollPosition } from '../../helpers/scroll';
 import { throttle } from 'lodash-es';
 
-import { ImageListItem } from '../ImageList';
+import { ImageListItemState, SPLICE_SIZE } from '../ImageList';
 import { Container, Heading, Button, Text } from '@chakra-ui/react';
+import ImageListItem from '../../components/ImageListItem';
 import StackSkleton from '../../components/StackSkeleton';
-
-import './index.scss';
 
 const cellCache = new CellMeasurerCache({
   defaultWidth: 100,
   fixedWidth: true,
 });
 
-let totalList: ImageListItem[] = [];
+let totalList: ImageListItemState[] = [];
 
 const ImageListVirtualized = () => {
-  const [list, setList] = useState<ImageListItem[]>([]);
+  const [list, setList] = useState<ImageListItemState[]>([]);
   const listRef = useRef<List>(null);
 
   const rowRenderer = ({ index, key, parent, style }: ListRowProps) => {
@@ -25,15 +24,12 @@ const ImageListVirtualized = () => {
       <CellMeasurer cache={cellCache} parent={parent} key={key} columnIndex={0} rowIndex={index}>
         {({ measure }) => (
           <div style={style} key={index}>
-            <div className="image-list-item">
-              <section className="thumb-wrap">
-                <img src={list[index].thumbnailUrl} alt="" onLoad={measure} />
-              </section>
-              <section>
-                <p>index: {index}</p>
-                <p>title: {list[index].title}</p>
-              </section>
-            </div>
+            <ImageListItem
+              index={index}
+              imageUrl={list[index].thumbnailUrl}
+              title={list[index].title}
+              onLoad={measure} // 중요: measure 함수로 이미지가 로드된 이후 재 측정을 해주어야 정확한 사이즈로 랜더링됩니다.
+            />
           </div>
         )}
       </CellMeasurer>
@@ -58,7 +54,7 @@ const ImageListVirtualized = () => {
       return;
     }
 
-    const data = totalList.splice(0, 100);
+    const data = totalList.splice(0, SPLICE_SIZE);
     setList([...list, ...data]);
   }, [list]);
 
@@ -104,8 +100,8 @@ const ImageListVirtualized = () => {
                     autoHeight
                     height={height}
                     width={width}
-                    isScrolling={isScrolling}
                     overscanRowCount={0}
+                    isScrolling={isScrolling}
                     onScroll={onChildScroll}
                     scrollTop={scrollTop}
                     rowCount={list.length}

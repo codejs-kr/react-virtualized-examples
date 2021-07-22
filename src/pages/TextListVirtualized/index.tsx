@@ -3,10 +3,10 @@ import { WindowScroller, CellMeasurer, CellMeasurerCache, AutoSizer, List, ListR
 import { checkInfiniteScrollPosition } from '../../helpers/scroll';
 import { throttle } from 'lodash-es';
 
-import { TextListItem } from '../TextList';
+import { TextListItemState } from '../TextList';
 import { Container, Heading, Button, Text } from '@chakra-ui/react';
 import StackSkleton from '../../components/StackSkeleton';
-import './index.scss';
+import TextListItem from '../../components/TextListItem';
 
 const cellCache = new CellMeasurerCache({
   defaultWidth: 100,
@@ -16,19 +16,15 @@ const cellCache = new CellMeasurerCache({
 let isFetching: boolean = false;
 
 const TextListVirtualized = () => {
-  const [list, setList] = useState<TextListItem[]>([]);
+  const [list, setList] = useState<TextListItemState[]>([]);
   const listRef = useRef<List>(null);
 
   const rowRenderer = ({ index, key, parent, style }: ListRowProps) => {
+    const { email, name, body } = list[index];
     return (
       <CellMeasurer cache={cellCache} parent={parent} key={key} columnIndex={0} rowIndex={index}>
         <div style={style} key={index}>
-          <div className="text-list-item">
-            <p>index: {index}</p>
-            <p>email: {list[index].email}</p>
-            <p>name: {list[index].name}</p>
-            <p>body: {list[index].body}</p>
-          </div>
+          <TextListItem index={index} email={email} name={name} body={body} />
         </div>
       </CellMeasurer>
     );

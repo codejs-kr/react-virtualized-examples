@@ -1,30 +1,63 @@
 import { useEffect, useState, useCallback } from 'react';
+import { checkInfiniteScrollPosition } from '../../helpers/scroll';
+import { throttle } from 'lodash-es';
+
 import { Container, Heading, Button, Text } from '@chakra-ui/react';
 import StackSkleton from '../../components/StackSkeleton';
-import './index.scss';
+import ImageListItem from '../../components/ImageListItem';
 
-export interface ImageListItem {
+export interface ImageListItemState {
   id: number;
   title: string;
+  url: string;
   thumbnailUrl: string;
 }
 
-const ImageList = () => {
-  const [list, setList] = useState<ImageListItem[]>([]);
+export const SPLICE_SIZE = 500;
 
-  const addList = useCallback(() => {
+let totalList: ImageListItemState[] = [];
+
+const ImageList = () => {
+  const [list, setList] = useState<ImageListItemState[]>([]);
+
+  const fetchData = useCallback(async () => {
+    // const res = await fetch('https://jsonplaceholder.typicode.com/photos');
+    // console.log('res :>> ', res);
     fetch('https://jsonplaceholder.typicode.com/photos').then((res) => {
       const data = res.json();
 
       data.then((newList) => {
-        setList([...list, ...newList]);
+        totalList = newList;
+        addList();
       });
     });
-  }, [list, setList]);
+  }, []);
+
+  const addList = useCallback(() => {
+    if (!totalList.length) {
+      return;
+    }
+
+    const data = totalList.splice(0, SPLICE_SIZE);
+    setList([...list, ...data]);
+  }, [list]);
+
+  const onScroll = useCallback(() => {
+    const isNeedFetching = checkInfiniteScrollPosition({ bottom: 600 });
+    if (isNeedFetching) {
+      addList();
+    }
+  }, [addList]);
 
   useEffect(() => {
-    addList();
-  }, []);
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    const onScrollTrottle = throttle(onScroll, 100);
+    window.addEventListener('scroll', onScrollTrottle);
+    return () => window.removeEventListener('scroll', onScrollTrottle);
+  }, [onScroll]);
 
   return (
     <>
@@ -43,11 +76,7 @@ const ImageList = () => {
       <section>
         {list.length ? (
           list.map(({ title, thumbnailUrl }, index) => (
-            <div className="text-list-item">
-              <div>index: {index}</div>
-              <div>title: {title}</div>
-              <div>body: {thumbnailUrl}</div>
-            </div>
+            <ImageListItem index={index} imageUrl={thumbnailUrl} title={title} />
           ))
         ) : (
           <StackSkleton count={5} />

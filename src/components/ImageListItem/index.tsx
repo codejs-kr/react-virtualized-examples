@@ -15,9 +15,7 @@ const ImageListItem = ({ index, imageUrl, title, onLoad }: Props) => {
       </section>
       <section>
         <p>index: {index}</p>
-        <p>
-          {title} {title} {title} {title} {title} {title}
-        </p>
+        <p>{Array.from({ length: 10 }).map(() => title)}</p>
       </section>
     </div>
   );

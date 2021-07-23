@@ -2,14 +2,15 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { WindowScroller, CellMeasurer, CellMeasurerCache, AutoSizer, List, ListRowProps } from 'react-virtualized';
 import { checkInfiniteScrollPosition } from '../../helpers/scroll';
 import { throttle } from 'lodash-es';
+import { fetchPhotos } from '../../apis';
 
-import { ImageListItemState, SPLICE_SIZE } from '../ImageList';
 import { Container, Heading, Button, Text } from '@chakra-ui/react';
+import { CheckCircleIcon } from '@chakra-ui/icons';
+import { ImageListItemState, SPLICE_SIZE } from '../ImageList';
 import ImageListItem from '../../components/ImageListItem';
-import StackSkleton from '../../components/StackSkeleton';
+import StackSkeleton from '../../components/StackSkeleton';
 
 const cellCache = new CellMeasurerCache({
-  defaultWidth: 100,
   fixedWidth: true,
 });
 
@@ -20,14 +21,15 @@ const ImageListVirtualized = () => {
   const listRef = useRef<List>(null);
 
   const rowRenderer = ({ index, key, parent, style }: ListRowProps) => {
+    const { title, url } = list[index];
     return (
       <CellMeasurer cache={cellCache} parent={parent} key={key} columnIndex={0} rowIndex={index}>
         {({ measure }) => (
           <div style={style} key={index}>
             <ImageListItem
               index={index}
-              imageUrl={list[index].thumbnailUrl}
-              title={list[index].title}
+              title={title}
+              imageUrl={url}
               onLoad={measure} // 중요: measure 함수로 이미지가 로드된 이후 재 측정을 해주어야 정확한 사이즈로 랜더링됩니다.
             />
           </div>
@@ -37,16 +39,9 @@ const ImageListVirtualized = () => {
   };
 
   const fetchData = useCallback(async () => {
-    // const res = await fetch('https://jsonplaceholder.typicode.com/photos');
-    // console.log('res :>> ', res);
-    fetch('https://jsonplaceholder.typicode.com/photos').then((res) => {
-      const data = res.json();
-
-      data.then((newList) => {
-        totalList = newList;
-        addList();
-      });
-    });
+    const response = await fetchPhotos();
+    totalList = response;
+    addList();
   }, []);
 
   const addList = useCallback(() => {
@@ -79,7 +74,7 @@ const ImageListVirtualized = () => {
     <>
       <Container padding={0} marginBottom={5} textAlign="center">
         <Heading size="md" mb={5} textAlign="center">
-          react-virtualized (O)
+          react-virtualized (<CheckCircleIcon color="green.500" />)
         </Heading>
         <Button mb={5} colorScheme="blue" onClick={addList}>
           목록 추가하기
@@ -114,7 +109,7 @@ const ImageListVirtualized = () => {
             )}
           </WindowScroller>
         ) : (
-          <StackSkleton count={5} />
+          <StackSkeleton count={5} />
         )}
       </section>
     </>

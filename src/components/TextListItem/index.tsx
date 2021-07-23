@@ -13,9 +13,7 @@ const TextListItem = ({ index, email, name, body }: Props) => {
       <p>index: {index}</p>
       <p>email: {email}</p>
       <p>name: {name}</p>
-      <p>
-        body: {body} {body}
-      </p>
+      <p>body: {Array.from({ length: 2 }).map(() => body)}</p>
     </div>
   );
 };

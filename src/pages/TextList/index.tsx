@@ -1,10 +1,12 @@
 import { useEffect, useState, useCallback, Fragment } from 'react';
 import { checkInfiniteScrollPosition } from '../../helpers/scroll';
 import { throttle } from 'lodash-es';
+import { fetchComments } from '../../apis';
 
 import { Container, Heading, Button, Text } from '@chakra-ui/react';
-import StackSkleton from '../../components/StackSkeleton';
+import StackSkeleton from '../../components/StackSkeleton';
 import TextListItem from '../../components/TextListItem';
+import Loader from '../../components/Loader';
 
 export interface TextListItemState {
   id: number;
@@ -13,26 +15,17 @@ export interface TextListItemState {
   body: string;
 }
 
-let isFetching: boolean = false;
-
 const TextList = () => {
   const [list, setList] = useState<TextListItemState[]>([]);
+  const [isFetching, setFetching] = useState<boolean>(false);
 
-  const addList = useCallback(() => {
-    isFetching = true;
-    fetch('https://jsonplaceholder.typicode.com/comments').then((res) => {
-      const data = res.json();
+  const addList = useCallback(async () => {
+    setFetching(true);
 
-      data.then((newList) => {
-        setList([...list, ...newList]);
-        isFetching = false;
-      });
-    });
+    const response = await fetchComments();
+    setList([...list, ...response]);
+    setFetching(false);
   }, [list, setList]);
-
-  useEffect(() => {
-    addList();
-  }, []);
 
   const onScroll = useCallback(() => {
     if (isFetching) {
@@ -43,7 +36,11 @@ const TextList = () => {
     if (isNeedFetching) {
       addList();
     }
-  }, [addList]);
+  }, [isFetching, addList]);
+
+  useEffect(() => {
+    addList();
+  }, []);
 
   useEffect(() => {
     const onScrollTrottle = throttle(onScroll, 100);
@@ -67,13 +64,16 @@ const TextList = () => {
 
       <section>
         {list.length ? (
-          list.map(({ name, email, body }, index) => (
-            <Fragment key={index}>
-              <TextListItem index={index} email={email} name={name} body={body} />
-            </Fragment>
-          ))
+          <>
+            {list.map(({ name, email, body }, index) => (
+              <Fragment key={index}>
+                <TextListItem index={index} email={email} name={name} body={body} />
+              </Fragment>
+            ))}
+            {isFetching && <Loader />}
+          </>
         ) : (
-          <StackSkleton count={5} />
+          <StackSkeleton count={5} />
         )}
       </section>
     </>

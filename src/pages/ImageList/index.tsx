@@ -1,9 +1,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import { checkInfiniteScrollPosition } from '../../helpers/scroll';
 import { throttle } from 'lodash-es';
+import { fetchPhotos } from '../../apis';
 
 import { Container, Heading, Button, Text } from '@chakra-ui/react';
-import StackSkleton from '../../components/StackSkeleton';
+import StackSkeleton from '../../components/StackSkeleton';
 import ImageListItem from '../../components/ImageListItem';
 
 export interface ImageListItemState {
@@ -21,16 +22,9 @@ const ImageList = () => {
   const [list, setList] = useState<ImageListItemState[]>([]);
 
   const fetchData = useCallback(async () => {
-    // const res = await fetch('https://jsonplaceholder.typicode.com/photos');
-    // console.log('res :>> ', res);
-    fetch('https://jsonplaceholder.typicode.com/photos').then((res) => {
-      const data = res.json();
-
-      data.then((newList) => {
-        totalList = newList;
-        addList();
-      });
-    });
+    const response = await fetchPhotos();
+    totalList = response;
+    addList();
   }, []);
 
   const addList = useCallback(() => {
@@ -75,11 +69,13 @@ const ImageList = () => {
 
       <section>
         {list.length ? (
-          list.map(({ title, thumbnailUrl }, index) => (
-            <ImageListItem index={index} imageUrl={thumbnailUrl} title={title} />
-          ))
+          <>
+            {list.map(({ title, url }, index) => (
+              <ImageListItem key={index} index={index} imageUrl={url} title={title} />
+            ))}
+          </>
         ) : (
-          <StackSkleton count={5} />
+          <StackSkeleton count={5} />
         )}
       </section>
     </>

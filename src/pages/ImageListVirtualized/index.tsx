@@ -42,6 +42,7 @@ const ImageListVirtualized = () => {
     const response = await fetchPhotos();
     totalList = response;
     addList();
+    // eslint-disable-next-line
   }, []);
 
   const addList = useCallback(() => {

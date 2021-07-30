@@ -40,6 +40,7 @@ const TextList = () => {
 
   useEffect(() => {
     addList();
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {

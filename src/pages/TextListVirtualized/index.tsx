@@ -51,6 +51,7 @@ const TextListVirtualized = () => {
 
   useEffect(() => {
     addList();
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {

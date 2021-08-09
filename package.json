@@ -2,6 +2,7 @@
   "name": "react-virtualized-samples",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://play.codejs.co.kr/react-virtualized-examples",
   "dependencies": {
     "@chakra-ui/icons": "^1.0.13",
     "@chakra-ui/react": "^1.6.4",

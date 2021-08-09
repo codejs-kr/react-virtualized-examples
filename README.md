@@ -26,7 +26,7 @@ http://play.codejs.co.kr/react-virtualized-examples
 ## 사용된 주요 API
 
 - List : 창에 보이는 요소만 렌더링하는 컨테이너입니다. ([문서](https://github.com/bvaughn/react-virtualized/blob/master/docs/List.md))
-- CellMeasurer : 사용자가 볼 수 없는 방식으로 일시적으로 렌더링하여 셀 크기를 자동으로 측정하는 고차 구성 요소입니다. ([문서](https://github.com/bvaughn/react-virtualized/blob/master/docs/CellMeasurer.md))
+- CellMeasurer : 사용자가 볼 수 없는 방식으로 일시적으로 렌더링하여 셀 크기를 자동측정하는 고차 구성 요소입니다. ([문서](https://github.com/bvaughn/react-virtualized/blob/master/docs/CellMeasurer.md))
 - CellMeasurerCache : CellMeasurer의 결과를 부모(여기서는 List)와 공유합니다. ([문서](https://github.com/bvaughn/react-virtualized/blob/master/docs/CellMeasurer.md))
 - AutoSizer : 단일 자식의 너비와 높이를 자동으로 조정하는 고차 컴포넌트입니다. ([문서](https://github.com/bvaughn/react-virtualized/blob/master/docs/AutoSizer.md))
 

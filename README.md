@@ -15,12 +15,12 @@ http://play.codejs.co.kr/react-virtualized-examples
 ### 텍스트 목록에 react-virtualized 적용한 모습
 
 예제의 500개 목록 중 화면에 보이는 부분만 DOM으로 랜더링 하여 부하를 최소화 할 수 있습니다.<br>
-그로 인해 API로 JSON을 받아와 렌더링 하는 최초 시간과 추가적으로 목록을 더할 때도 최소 5배 이상 빠른 결과를 얻을 수 있습니다.
+그로 인해 API로 JSON을 받아와 렌더링 하는 최초 시간과 추가적으로 목록을 더할 때도 최소 5배 이상 빠른 결과를 얻을 수 있습니다.<br><br>
 ![Alt text](/public/virtualized-text.gif '텍스트 목록에 virtualized 적용한 모습')
 
 ### 이미지 목록에 react-virtualized 적용한 모습
 
-이미지가 있는 목록도 문제 없습니다.
+이미지가 있는 목록도 문제 없습니다. 이미지가 로드된 이후 요소의 사이즈 측정을 할 수 있어요!<br><br>
 ![Alt text](/public/virtualized-image.gif '이미지 목록에 react-virtualized 적용한 모습')
 
 ## 사용된 주요 API

@@ -96,7 +96,7 @@ const ImageListVirtualized = () => {
                     autoHeight
                     height={height}
                     width={width}
-                    overscanRowCount={0}
+                    overscanRowCount={5} // overscanRowCount 속성은 사용자가 스크롤하는 방향으로 추가 행을 렌더링하여 사용자가 가상화된 콘텐츠를 렌더링할 수 있는 것보다 빠르게 스크롤시 깜빡임을 최소화합니다.
                     isScrolling={isScrolling}
                     onScroll={onChildScroll}
                     scrollTop={scrollTop}

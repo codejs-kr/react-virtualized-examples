@@ -20,12 +20,11 @@ const App = () => {
               <Navigation />
             </Container>
             <Switch>
-              <Route exact path="/" component={TextList} />
               <Route path="/text-list" component={TextList} />
               <Route path="/image-list" component={ImageList} />
               <Route path="/text-list-virtualized" component={TextListVirtualized} />
               <Route path="/image-list-virtualized" component={ImageListVirtualized} />
-              <Redirect to="/" />
+              <Redirect to="/text-list-virtualized" />
             </Switch>
           </Router>
         </Container>

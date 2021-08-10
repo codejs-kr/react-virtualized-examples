@@ -12,6 +12,11 @@ http://play.codejs.co.kr/react-virtualized-examples
 
 일반적으로 목록을 많이 보여주는 화면과 react-virtualized를 사용하여 최적화 한 차이를 비교 제공합니다.
 
+### 일반적인 목록
+
+목록이 많아질수록 자연스럽게 DOM이 늘어나고 그로 인해 부하가 생겨 서비스 성능 저하의 원인이 됩니다.<br><br>
+![Alt text](/public/normal-text.png '일반적인 목록')
+
 ### 텍스트 목록에 react-virtualized 적용한 모습
 
 예제의 500개 목록 중 화면에 보이는 부분만 DOM으로 랜더링 하여 부하를 최소화 할 수 있습니다.<br>
